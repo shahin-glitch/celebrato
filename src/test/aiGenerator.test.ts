@@ -53,7 +53,7 @@ describe('AI Generator Service & Fallback Behavior', () => {
     const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
     // Mock global fetch to throw network error
-    global.fetch = vi.fn().mockRejectedValueOnce(new Error('Network offline or DNS error'));
+    globalThis.fetch = vi.fn().mockRejectedValueOnce(new Error('Network offline or DNS error'));
 
     const result = await AIGeneratorService.generateEventPlan(sampleInput, 'dummy-key');
 
@@ -69,7 +69,7 @@ describe('AI Generator Service & Fallback Behavior', () => {
   it('gracefully falls back to deterministic plan when Gemini returns HTTP 500 error', async () => {
     vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-    global.fetch = vi.fn().mockResolvedValueOnce({
+    globalThis.fetch = vi.fn().mockResolvedValueOnce({
       ok: false,
       status: 500,
       statusText: 'Internal Server Error',
@@ -85,7 +85,7 @@ describe('AI Generator Service & Fallback Behavior', () => {
   it('gracefully falls back to deterministic plan when Gemini returns malformed JSON or empty body', async () => {
     vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-    global.fetch = vi.fn().mockResolvedValueOnce({
+    globalThis.fetch = vi.fn().mockResolvedValueOnce({
       ok: true,
       json: async () => ({
         candidates: [{ content: { parts: [{ text: 'NOT VALID JSON' }] } }],
