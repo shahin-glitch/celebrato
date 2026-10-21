@@ -1,0 +1,84 @@
+@import "tailwindcss";
+
+@theme {
+  --font-mono: 'Space Mono', monospace;
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  
+  --color-mint: #C2F2B0;
+  --color-mint-dark: #A1E68C;
+  --color-butter: #FDF189;
+  --color-butter-dark: #F5E25E;
+  --color-lemon: #E3FFA8;
+  --color-lemon-dark: #CEF486;
+  --color-lilac: #E8DCF8;
+  --color-lilac-dark: #D4BFF2;
+  --color-peach: #FFC29E;
+  --color-sky: #62C5F3;
+  --color-cream: #FCFBF7;
+  --color-ink: #171717;
+}
+
+:root {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  color: #171717;
+  background-color: #F0E6FD;
+}
+
+/* Custom Neo-Brutalist & Retro-Modern Utilities */
+.neo-border {
+  border: 1.5px solid #171717;
+}
+
+.neo-border-2 {
+  border: 2px solid #171717;
+}
+
+.neo-shadow-sm {
+  box-shadow: 2px 2px 0px #171717;
+}
+
+.neo-shadow {
+  box-shadow: 3.5px 3.5px 0px #171717;
+}
+
+.neo-shadow-lg {
+  box-shadow: 5px 5px 0px #171717;
+}
+
+.neo-shadow-hover {
+  transition: all 0.15s ease-in-out;
+}
+
+.neo-shadow-hover:hover {
+  transform: translate(-1.5px, -1.5px);
+  box-shadow: 4.5px 4.5px 0px #171717;
+}
+
+.neo-shadow-hover:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1.5px 1.5px 0px #171717;
+}
+
+/* Monospace font utility for numbers and headings */
+.font-mono-code {
+  font-family: 'Space Mono', monospace;
+}
+
+/* Custom subtle scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D1D5DB;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9CA3AF;
+}
