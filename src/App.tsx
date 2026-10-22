@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import type { EventPlan, AppNotification, CurrencyType } from './types';
+import type { EventPlan, AppNotification } from './types';
 import { StorageService } from './services/storage';
 import { Sidebar } from './components/layout/Sidebar';
 import { TopHeader } from './components/layout/TopHeader';
@@ -27,9 +27,6 @@ export function App() {
   );
   const [notifications, setNotifications] = useState<AppNotification[]>(() =>
     StorageService.getNotifications()
-  );
-  const [currency, setCurrency] = useState<CurrencyType>(() =>
-    StorageService.getCurrency()
   );
 
   // Active view state
@@ -83,19 +80,6 @@ export function App() {
     setNotifications(StorageService.getNotifications());
   };
 
-  const handleCurrencyChange = (newCurr: CurrencyType) => {
-    setCurrency(newCurr);
-    StorageService.setCurrency(newCurr);
-    setEvents((prev) =>
-      prev.map((e) => ({
-        ...e,
-        budget: {
-          ...e.budget,
-          currency: newCurr,
-        },
-      }))
-    );
-  };
 
   const handleToggleTimelineTask = (taskId: string) => {
     if (!activeEvent) return;

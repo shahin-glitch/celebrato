@@ -30,7 +30,6 @@ describe('Accessibility Standards Validation', () => {
         activeTab="overview"
         setActiveTab={() => {}}
         openCreateWizard={() => {}}
-        openSettings={() => {}}
       />
     );
 
