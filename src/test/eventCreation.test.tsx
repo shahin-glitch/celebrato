@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import React from 'react';
 import { CreateEventWizard } from '../components/events/CreateEventWizard';
 import { AIGeneratorService } from '../services/aiGenerator';
 import type { EventPlan } from '../types';

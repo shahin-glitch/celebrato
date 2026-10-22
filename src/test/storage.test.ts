@@ -120,8 +120,8 @@ describe('Persistent Storage Service', () => {
 
   it('persists and retrieves API key', () => {
     expect(StorageService.getApiKey()).toBe('');
-    StorageService.setApiKey('AIzaSyD-TestKey-12345');
-    expect(StorageService.getApiKey()).toBe('AIzaSyD-TestKey-12345');
+    StorageService.setApiKey('mock-gemini-key-12345');
+    expect(StorageService.getApiKey()).toBe('mock-gemini-key-12345');
   });
 
   it('manages notifications and marks them as read', () => {

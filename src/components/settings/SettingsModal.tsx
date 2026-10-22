@@ -105,7 +105,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               type="password"
               id="gemini-api-key"
               aria-label="Google Gemini API Key"
-              placeholder="AIzaSy..."
+              placeholder="Paste Gemini API key..."
               value={apiKey}
               onChange={(e) => setApiKey(e.target.value)}
               className="flex-1 bg-white p-2 text-xs rounded-lg neo-border focus:outline-none font-mono-code"

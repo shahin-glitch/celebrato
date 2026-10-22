@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import React from 'react';
 import { TopHeader } from '../components/layout/TopHeader';
 import { Sidebar } from '../components/layout/Sidebar';
 import { INITIAL_EVENTS } from '../services/sampleData';

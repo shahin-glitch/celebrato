@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import type { EventPlan, AppNotification, CurrencyType } from './types';
 import { StorageService } from './services/storage';
 import { Sidebar } from './components/layout/Sidebar';

@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import React from 'react';
 import { SettingsModal } from '../components/settings/SettingsModal';
 import { StorageService } from '../services/storage';
 
@@ -38,12 +37,12 @@ describe('SettingsModal Component', () => {
     expect(screen.getByText('Settings & AI Engine')).toBeInTheDocument();
 
     const keyInput = screen.getByLabelText(/Google Gemini API Key/i);
-    fireEvent.change(keyInput, { target: { value: 'AIzaSyTestKey123' } });
+    fireEvent.change(keyInput, { target: { value: 'mock-gemini-key-123' } });
 
     const saveBtn = screen.getByRole('button', { name: /Save Key/i });
     fireEvent.click(saveBtn);
 
-    expect(setApiKeySpy).toHaveBeenCalledWith('AIzaSyTestKey123');
+    expect(setApiKeySpy).toHaveBeenCalledWith('mock-gemini-key-123');
     expect(screen.getByText('Saved!')).toBeInTheDocument();
   });
 

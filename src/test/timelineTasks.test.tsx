@@ -1,6 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import React from 'react';
 import { TimelineTasks } from '../components/timeline/TimelineTasks';
 import type { EventPlan, TimelineTask } from '../types';
 
