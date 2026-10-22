@@ -8,7 +8,6 @@ import {
   Users,
   Palette,
   FolderHeart,
-  Settings,
   PlusCircle,
 } from 'lucide-react';
 
@@ -16,14 +15,12 @@ interface SidebarProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
   openCreateWizard: () => void;
-  openSettings: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
   activeTab,
   setActiveTab,
   openCreateWizard,
-  openSettings,
 }) => {
   const navItems = [
     { id: 'overview', label: 'Dashboard', icon: LayoutDashboard },
@@ -103,20 +100,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </button>
       </nav>
 
-      {/* Bottom Settings Cog */}
-      <div className="flex flex-col items-center gap-2">
-        <button
-          onClick={openSettings}
-          title="Settings & Gemini AI Key"
-          aria-label="Settings & Gemini AI Key"
-          className="p-3 rounded-xl text-[#171717] hover:bg-black/10 transition-colors cursor-pointer group relative"
-        >
-          <Settings className="w-5 h-5 stroke-[2] group-hover:rotate-45 transition-transform" />
-          <div className="hidden lg:group-hover:flex absolute left-full ml-3 px-2.5 py-1 bg-[#171717] text-white text-xs font-semibold rounded-md shadow-md whitespace-nowrap pointer-events-none z-50">
-            Settings & AI Key
-          </div>
-        </button>
-      </div>
+
     </aside>
   );
 };

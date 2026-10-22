@@ -14,7 +14,7 @@ import { GuestManager } from './components/guests/GuestManager';
 import { ThemeGallery } from './components/themes/ThemeGallery';
 import { MyEventsList } from './components/events/MyEventsList';
 import { CreateEventWizard } from './components/events/CreateEventWizard';
-import { SettingsModal } from './components/settings/SettingsModal';
+
 import { NotificationDrawer } from './components/notifications/NotificationDrawer';
 import { SAMPLE_VENDORS, THEME_GALLERY } from './services/sampleData';
 import { X } from 'lucide-react';
@@ -39,7 +39,7 @@ export function App() {
   // Modals state
   const [isRescueModalOpen, setIsRescueModalOpen] = useState(false);
   const [isCreateWizardOpen, setIsCreateWizardOpen] = useState(false);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
 
   // Active Event resolution
@@ -197,7 +197,6 @@ export function App() {
             setSearchQuery('');
           }}
           openCreateWizard={() => setIsCreateWizardOpen(true)}
-          openSettings={() => setIsSettingsOpen(true)}
         />
 
         {/* Central Main Workspace */}
@@ -416,14 +415,7 @@ export function App() {
         }}
       />
 
-      {/* Settings Modal */}
-      <SettingsModal
-        isOpen={isSettingsOpen}
-        onClose={() => setIsSettingsOpen(false)}
-        currency={currency}
-        onCurrencyChange={handleCurrencyChange}
-        onResetDemo={handleResetDemoData}
-      />
+
 
       {/* In-App Notifications Drawer */}
       <NotificationDrawer
