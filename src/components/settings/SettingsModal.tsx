@@ -6,8 +6,6 @@ import {
   X,
   Key,
   DollarSign,
-  RotateCcw,
-  Download,
 } from 'lucide-react';
 
 interface SettingsModalProps {
@@ -48,16 +46,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     setTimeout(() => setSavedSuccess(false), 2000);
   };
 
-  const handleExportData = () => {
-    const events = StorageService.getEvents();
-    const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(events, null, 2));
-    const downloadAnchor = document.createElement('a');
-    downloadAnchor.setAttribute('href', dataStr);
-    downloadAnchor.setAttribute('download', 'celebrato_backup.json');
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    downloadAnchor.remove();
-  };
+
 
   return (
     <div
@@ -142,33 +131,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           </div>
         </div>
 
-        {/* Data Persistence & Demo Controls */}
-        <div className="p-4 bg-white rounded-xl neo-border space-y-3">
-          <span className="font-mono-code font-bold text-xs text-[#171717]">
-            Data Management
-          </span>
-          <div className="flex items-center justify-between gap-3 pt-1">
-            <button
-              onClick={handleExportData}
-              className="flex items-center gap-1.5 px-3 py-2 bg-[#FCFBF7] text-[#171717] rounded-lg neo-border font-mono-code text-xs font-bold hover:bg-black/5 cursor-pointer"
-            >
-              <Download className="w-3.5 h-3.5" />
-              <span>Export JSON</span>
-            </button>
-            <button
-              onClick={() => {
-                if (confirm('Reset sample data to initial hackathon state?')) {
-                  onResetDemo();
-                  onClose();
-                }
-              }}
-              className="flex items-center gap-1.5 px-3 py-2 bg-[#FFC29E] text-[#171717] rounded-lg neo-border font-mono-code text-xs font-bold hover:bg-[#ffb082] cursor-pointer"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-              <span>Reset Demo State</span>
-            </button>
-          </div>
-        </div>
+
       </div>
     </div>
   );
