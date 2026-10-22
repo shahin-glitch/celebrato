@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { EventPlan, TimelineTask } from '../../types';
+import type { EventPlan } from '../../types';
 import {
   Calendar as CalendarIcon,
   MessageSquare,
@@ -143,12 +143,14 @@ export const RightPlannerPanel: React.FC<RightPlannerPanelProps> = ({
           <div className="flex items-center gap-3 text-[#171717]">
             <button
               title="Calendar"
+              aria-label="Open Calendar"
               className="p-1.5 hover:bg-black/10 rounded-lg transition-colors cursor-pointer"
             >
               <CalendarIcon className="w-5 h-5 stroke-[2]" />
             </button>
             <button
               title="Team Chat"
+              aria-label="Team Chat"
               className="p-1.5 hover:bg-black/10 rounded-lg transition-colors cursor-pointer"
             >
               <MessageSquare className="w-5 h-5 stroke-[2]" />
@@ -156,6 +158,7 @@ export const RightPlannerPanel: React.FC<RightPlannerPanelProps> = ({
             <button
               onClick={onOpenNotifications}
               title="Notifications"
+              aria-label={`Notifications (${unreadNotificationsCount} unread)`}
               className="p-1.5 hover:bg-black/10 rounded-lg transition-colors cursor-pointer relative"
             >
               <Bell className="w-5 h-5 stroke-[2]" />
@@ -188,12 +191,14 @@ export const RightPlannerPanel: React.FC<RightPlannerPanelProps> = ({
             <div className="flex items-center gap-1">
               <button
                 onClick={handlePrevMonth}
+                aria-label="Previous month"
                 className="p-1 hover:bg-black/10 rounded-md transition-colors cursor-pointer text-[#171717]"
               >
                 <ChevronLeft className="w-4 h-4 stroke-[2.5]" />
               </button>
               <button
                 onClick={handleNextMonth}
+                aria-label="Next month"
                 className="p-1 hover:bg-black/10 rounded-md transition-colors cursor-pointer text-[#171717]"
               >
                 <ChevronRight className="w-4 h-4 stroke-[2.5]" />
@@ -282,7 +287,17 @@ export const RightPlannerPanel: React.FC<RightPlannerPanelProps> = ({
               {scheduledTasks.map((task) => (
                 <div
                   key={task.id}
+                  role="checkbox"
+                  aria-checked={task.completed}
+                  aria-label={`${task.title} (${task.timeSlot})`}
+                  tabIndex={0}
                   onClick={() => onToggleTask(task.id)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      onToggleTask(task.id);
+                    }
+                  }}
                   className={`p-2.5 rounded-xl neo-border cursor-pointer transition-transform hover:-translate-y-0.5 neo-shadow-sm ${task.color}`}
                 >
                   <div className="flex items-center justify-between gap-1">

@@ -38,6 +38,54 @@ export interface GeneratedAIResponse {
   source: 'gemini' | 'deterministic';
 }
 
+interface RawGeminiCategory {
+  id?: string;
+  name?: string;
+  amount?: number | string;
+  percentage?: number | string;
+  reason?: string;
+  priority?: string;
+  isProtected?: boolean;
+}
+
+interface RawGeminiTask {
+  id?: string;
+  title?: string;
+  dueDate?: string;
+  timeSlot?: string;
+  priority?: string;
+  category?: string;
+  completed?: boolean;
+  notes?: string;
+}
+
+interface RawGeminiVendorItem {
+  id?: string;
+  category?: string;
+  reason?: string;
+  estimatedMin?: number | string;
+  estimatedMax?: number | string;
+  bookingDeadline?: string;
+  questions?: string[];
+  status?: string;
+}
+
+interface RawGeminiRecommendation {
+  id?: string;
+  title?: string;
+  description?: string;
+  estimatedSavings?: number | string;
+  type?: string;
+}
+
+interface RawGeminiOutput {
+  concept?: Partial<EventConcept>;
+  categories?: RawGeminiCategory[];
+  timeline?: RawGeminiTask[];
+  vendorChecklist?: RawGeminiVendorItem[];
+  recommendations?: RawGeminiRecommendation[];
+}
+
 export const AIGeneratorService = {
   async generateEventPlan(
     input: GeneratePlanInput,
@@ -186,25 +234,23 @@ Cultural: ${input.culturalPreferences || 'Inclusive and respectful'}`;
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
     if (!text) throw new Error('Empty response from Gemini');
 
-    const parsed = JSON.parse(text);
+    const parsed: RawGeminiOutput = JSON.parse(text);
     return this.validateAndNormalizeGeminiOutput(parsed, input);
   },
 
   validateAndNormalizeGeminiOutput(
-    parsed: any,
+    parsed: RawGeminiOutput,
     input: GeneratePlanInput
   ): Omit<GeneratedAIResponse, 'source'> {
     // Validate and enforce budget totals strictly
     let categories: BudgetCategory[] = Array.isArray(parsed.categories)
-      ? parsed.categories.map((c: any, i: number) => ({
+      ? parsed.categories.map((c: RawGeminiCategory, i: number) => ({
           id: c.id || `cat-${i + 1}`,
           name: String(c.name || `Category ${i + 1}`),
           amount: Math.round(Number(c.amount) || 0),
           percentage: Number(c.percentage) || 0,
           reason: String(c.reason || ''),
-          priority: ['high', 'medium', 'low'].includes(c.priority)
-            ? c.priority
-            : 'medium',
+          priority: (c.priority === 'high' || c.priority === 'low' ? c.priority : 'medium') as 'high' | 'medium' | 'low',
           isProtected: Boolean(c.isProtected),
         }))
       : [];
@@ -245,14 +291,12 @@ Cultural: ${input.culturalPreferences || 'Inclusive and respectful'}`;
     };
 
     const timeline: TimelineTask[] = Array.isArray(parsed.timeline)
-      ? parsed.timeline.map((t: any, i: number) => ({
+      ? parsed.timeline.map((t: RawGeminiTask, i: number) => ({
           id: t.id || `task-${i + 1}`,
           title: String(t.title || `Milestone ${i + 1}`),
           dueDate: t.dueDate || input.date,
           timeSlot: t.timeSlot || '10:00 AM',
-          priority: ['high', 'medium', 'low'].includes(t.priority)
-            ? t.priority
-            : 'medium',
+          priority: (t.priority === 'high' || t.priority === 'low' ? t.priority : 'medium') as 'high' | 'medium' | 'low',
           category: t.category || 'General',
           completed: false,
           notes: t.notes || '',
@@ -260,7 +304,7 @@ Cultural: ${input.culturalPreferences || 'Inclusive and respectful'}`;
       : [];
 
     const vendorChecklist: VendorChecklistItem[] = Array.isArray(parsed.vendorChecklist)
-      ? parsed.vendorChecklist.map((v: any, i: number) => ({
+      ? parsed.vendorChecklist.map((v: RawGeminiVendorItem, i: number) => ({
           id: v.id || `vc-${i + 1}`,
           category: String(v.category || 'Vendor'),
           reason: String(v.reason || 'Crucial for event execution'),
@@ -275,14 +319,14 @@ Cultural: ${input.culturalPreferences || 'Inclusive and respectful'}`;
       : [];
 
     const recommendations: EventRecommendation[] = Array.isArray(parsed.recommendations)
-      ? parsed.recommendations.map((r: any, i: number) => ({
+      ? parsed.recommendations.map((r: RawGeminiRecommendation, i: number) => ({
           id: r.id || `rec-${i + 1}`,
           title: String(r.title || 'Smart Tip'),
           description: String(r.description || ''),
           estimatedSavings: Number(r.estimatedSavings) || 0,
-          type: ['low_cost', 'premium_upgrade', 'weather', 'comfort', 'cultural'].includes(r.type)
+          type: (['low_cost', 'premium_upgrade', 'weather', 'comfort', 'cultural'].includes(r.type || '')
             ? r.type
-            : 'low_cost',
+            : 'low_cost') as EventRecommendation['type'],
         }))
       : [];
 

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import type { EventPlan, BudgetCategory, RescueSuggestion } from '../../types';
 import {
   generateRescueSuggestions,
@@ -40,6 +40,17 @@ export const BudgetRescueModal: React.FC<BudgetRescueModalProps> = ({
   const [protectedCategoryIds, setProtectedCategoryIds] = useState<string[]>(
     event.budget.categories.filter((c) => c.isProtected).map((c) => c.id)
   );
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   const toggleCategoryProtection = (catId: string) => {
     setProtectedCategoryIds((prev) =>
@@ -110,7 +121,12 @@ export const BudgetRescueModal: React.FC<BudgetRescueModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="budget-rescue-title"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150"
+    >
       <div className="bg-[#FCFBF7] w-full max-w-3xl rounded-[24px] neo-border neo-shadow-lg flex flex-col max-h-[92vh] overflow-hidden my-auto">
         {/* Modal Header */}
         <div className="bg-[#F4BCE8] p-4 sm:p-5 neo-border-b flex items-center justify-between shrink-0">
@@ -120,7 +136,7 @@ export const BudgetRescueModal: React.FC<BudgetRescueModalProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="font-mono-code text-xl font-bold text-[#171717]">
+                <h2 id="budget-rescue-title" className="font-mono-code text-xl font-bold text-[#171717]">
                   Budget Rescue Mode
                 </h2>
                 <span className="text-[10px] font-mono-code font-bold bg-[#171717] text-white px-2 py-0.5 rounded-full">
@@ -134,6 +150,7 @@ export const BudgetRescueModal: React.FC<BudgetRescueModalProps> = ({
           </div>
           <button
             onClick={onClose}
+            aria-label="Close Budget Rescue Modal"
             className="p-2 hover:bg-black/10 rounded-full transition-colors cursor-pointer text-[#171717]"
           >
             <X className="w-5 h-5 stroke-[2.5]" />
@@ -157,9 +174,10 @@ export const BudgetRescueModal: React.FC<BudgetRescueModalProps> = ({
                 <span>{event.budget.currency}</span>
                 <input
                   type="number"
+                  aria-label="New Target Budget"
                   value={targetBudget}
                   onChange={(e) => setTargetBudget(Math.max(1000, Number(e.target.value)))}
-                  className="w-full bg-white px-2 py-0.5 rounded border border-[#171717] font-mono-code text-lg font-bold focus:outline-none"
+                  className="w-full bg-white px-2 py-0.5 rounded border border-[#171717] font-mono-code text-lg font-bold focus:outline-none focus:ring-1 focus:ring-black"
                 />
               </div>
             </div>
@@ -187,6 +205,7 @@ export const BudgetRescueModal: React.FC<BudgetRescueModalProps> = ({
               <button
                 key={preset.label}
                 onClick={() => setTargetBudget(Math.round(currentTotal * preset.ratio))}
+                aria-label={`Preset ${preset.label}`}
                 className="px-2.5 py-1 text-xs font-mono-code font-bold bg-white neo-border rounded-lg hover:bg-[#FDF189] transition-colors cursor-pointer"
               >
                 {preset.label}
@@ -214,6 +233,11 @@ export const BudgetRescueModal: React.FC<BudgetRescueModalProps> = ({
                   <button
                     key={cat.id}
                     onClick={() => toggleCategoryProtection(cat.id)}
+                    aria-label={
+                      isLocked
+                        ? `Unlock ${cat.name} (currently protected)`
+                        : `Lock ${cat.name} to protect from cuts`
+                    }
                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl neo-border text-xs font-semibold transition-all cursor-pointer ${
                       isLocked
                         ? 'bg-[#C2F2B0] text-[#171717] neo-shadow-sm font-bold'
@@ -275,6 +299,7 @@ export const BudgetRescueModal: React.FC<BudgetRescueModalProps> = ({
                   <input
                     type="checkbox"
                     checked={sug.accepted}
+                    aria-label={`Select substitution: ${sug.title}`}
                     onChange={(e) => {
                       e.stopPropagation();
                       toggleSuggestion(sug.id);

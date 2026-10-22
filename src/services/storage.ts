@@ -115,7 +115,7 @@ export const StorageService = {
         return INITIAL_NOTIFICATIONS;
       }
       return JSON.parse(data);
-    } catch (e) {
+    } catch {
       return INITIAL_NOTIFICATIONS;
     }
   },
@@ -166,7 +166,7 @@ export const StorageService = {
     try {
       const saved = localStorage.getItem(STORAGE_KEYS.USER_PROFILE);
       if (saved) return JSON.parse(saved);
-    } catch (e) {
+    } catch {
       // ignore
     }
     return {

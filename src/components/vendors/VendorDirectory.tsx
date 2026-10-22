@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import type { EventPlan, VendorDirectoryItem, VendorChecklistItem } from '../../types';
 import { SAMPLE_VENDORS } from '../../services/sampleData';
+import { generateId } from '../../utils/helpers';
 import {
   Store,
   Search,
@@ -50,7 +51,7 @@ export const VendorDirectory: React.FC<VendorDirectoryProps> = ({
     if (exists) return;
 
     const newChecklistItem: VendorChecklistItem = {
-      id: `vc-${Date.now()}`,
+      id: generateId('vc'),
       category: vendor.category,
       reason: `Partnered service from directory: ${vendor.name}`,
       estimatedMin: 10000,
@@ -138,17 +139,19 @@ export const VendorDirectory: React.FC<VendorDirectoryProps> = ({
               <input
                 type="text"
                 placeholder="Search vendor name, category, or city..."
+                aria-label="Search vendor name, category, or city"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-white pl-9 pr-3 py-2 rounded-xl neo-border text-xs focus:outline-none"
+                className="w-full bg-white pl-9 pr-3 py-2 rounded-xl neo-border text-xs focus:outline-none focus:ring-1 focus:ring-black"
               />
             </div>
 
             <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto">
               <select
                 value={selectedCategory}
+                aria-label="Filter vendors by category"
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="bg-white px-3 py-2 rounded-xl neo-border text-xs font-mono-code font-bold focus:outline-none"
+                className="bg-white px-3 py-2 rounded-xl neo-border text-xs font-mono-code font-bold focus:outline-none focus:ring-1 focus:ring-black"
               >
                 {categories.map((c) => (
                   <option key={c} value={c}>
@@ -159,8 +162,9 @@ export const VendorDirectory: React.FC<VendorDirectoryProps> = ({
 
               <select
                 value={selectedPrice}
+                aria-label="Filter vendors by price level"
                 onChange={(e) => setSelectedPrice(e.target.value)}
-                className="bg-white px-3 py-2 rounded-xl neo-border text-xs font-mono-code font-bold focus:outline-none"
+                className="bg-white px-3 py-2 rounded-xl neo-border text-xs font-mono-code font-bold focus:outline-none focus:ring-1 focus:ring-black"
               >
                 <option value="all">Any Price</option>
                 <option value="$">$ (Budget)</option>
@@ -238,6 +242,7 @@ export const VendorDirectory: React.FC<VendorDirectoryProps> = ({
                     <button
                       onClick={() => handleAddVendorToEvent(vendor)}
                       disabled={isSaved}
+                      aria-label={isSaved ? `${vendor.name} is added to checklist` : `Add ${vendor.name} to event`}
                       className={`flex items-center gap-1 px-3 py-1.5 rounded-lg font-mono-code text-xs font-bold transition-all cursor-pointer ${
                         isSaved
                           ? 'bg-[#C2F2B0] text-[#171717] border border-[#171717]'
@@ -280,10 +285,11 @@ export const VendorDirectory: React.FC<VendorDirectoryProps> = ({
                   {/* Status Dropdown */}
                   <select
                     value={vc.status}
+                    aria-label={`Status for ${vc.category}`}
                     onChange={(e) =>
-                      handleUpdateChecklistStatus(vc.id, e.target.value as any)
+                      handleUpdateChecklistStatus(vc.id, e.target.value as VendorChecklistItem['status'])
                     }
-                    className="font-mono-code text-xs font-bold px-2 py-1 rounded-lg neo-border bg-[#FCFBF7] focus:outline-none"
+                    className="font-mono-code text-xs font-bold px-2 py-1 rounded-lg neo-border bg-[#FCFBF7] focus:outline-none focus:ring-1 focus:ring-black"
                   >
                     <option value="not_started">Not Started</option>
                     <option value="researching">Researching</option>

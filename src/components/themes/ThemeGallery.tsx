@@ -7,7 +7,6 @@ import {
   Sparkles,
   Shirt,
   Lamp,
-  HelpCircle,
   Lightbulb,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
@@ -45,7 +44,7 @@ export const ThemeGallery: React.FC<ThemeGalleryProps> = ({
         spread: 50,
         origin: { y: 0.6 },
       });
-    } catch (e) {
+    } catch {
       // ignore
     }
   };
@@ -115,6 +114,7 @@ export const ThemeGallery: React.FC<ThemeGalleryProps> = ({
                     <div
                       key={i}
                       title={c}
+                      aria-label={`Color swatch ${c}`}
                       className="w-7 h-7 rounded-lg border border-[#171717] shadow-xs"
                       style={{ backgroundColor: c }}
                     ></div>
@@ -152,6 +152,11 @@ export const ThemeGallery: React.FC<ThemeGalleryProps> = ({
               <button
                 onClick={() => handleApplyTheme(theme)}
                 disabled={isCurrent}
+                aria-label={
+                  isCurrent
+                    ? `Theme ${theme.title} is currently active`
+                    : `Apply theme ${theme.title} to event`
+                }
                 className={`w-full py-2.5 rounded-xl font-mono-code text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                   isCurrent
                     ? 'bg-[#171717] text-[#C2F2B0]'

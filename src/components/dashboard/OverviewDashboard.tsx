@@ -88,6 +88,7 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
           </div>
           <button
             onClick={() => setActiveTab('budget')}
+            aria-label="View rescued budget breakdown"
             className="font-bold underline hover:text-black cursor-pointer"
           >
             View Breakdown →
@@ -105,7 +106,10 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
                 {currency === 'INR' ? '₹' : '$'}
               </span>
             </div>
-            <button className="text-[#171717] hover:bg-black/10 p-1 rounded-md transition-colors cursor-pointer">
+            <button
+              aria-label="Options for total planned budget"
+              className="text-[#171717] hover:bg-black/10 p-1 rounded-md transition-colors cursor-pointer"
+            >
               <MoreHorizontal className="w-4 h-4 stroke-[2.5]" />
             </button>
           </div>
@@ -126,7 +130,10 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
             <div className="w-10 h-10 rounded-full border-1.5 border-[#171717] flex items-center justify-center bg-black/5">
               <PieChart className="w-4 h-4 text-[#171717] stroke-[2]" />
             </div>
-            <button className="text-[#171717] hover:bg-black/10 p-1 rounded-md transition-colors cursor-pointer">
+            <button
+              aria-label="Options for allocated expenses"
+              className="text-[#171717] hover:bg-black/10 p-1 rounded-md transition-colors cursor-pointer"
+            >
               <MoreHorizontal className="w-4 h-4 stroke-[2.5]" />
             </button>
           </div>
@@ -147,7 +154,10 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
             <div className="w-10 h-10 rounded-full border-1.5 border-[#171717] flex items-center justify-center bg-white/40">
               <Clock className="w-4 h-4 text-[#171717] stroke-[2]" />
             </div>
-            <button className="text-[#171717] hover:bg-black/10 p-1 rounded-md transition-colors cursor-pointer">
+            <button
+              aria-label="Options for guest RSVPs"
+              className="text-[#171717] hover:bg-black/10 p-1 rounded-md transition-colors cursor-pointer"
+            >
               <MoreHorizontal className="w-4 h-4 stroke-[2.5]" />
             </button>
           </div>
@@ -170,7 +180,10 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
             <div className="w-10 h-10 rounded-full border-1.5 border-[#171717] flex items-center justify-center bg-white/40">
               <CreditCard className="w-4 h-4 text-[#171717] stroke-[2]" />
             </div>
-            <button className="text-[#171717] hover:bg-black/10 p-1 rounded-md transition-colors cursor-pointer">
+            <button
+              aria-label="Options for emergency buffer reserve"
+              className="text-[#171717] hover:bg-black/10 p-1 rounded-md transition-colors cursor-pointer"
+            >
               <MoreHorizontal className="w-4 h-4 stroke-[2.5]" />
             </button>
           </div>
@@ -250,6 +263,7 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
                 onClick={openBudgetRescue}
                 className="flex items-center gap-1.5 px-3 py-1 bg-[#F4BCE8] hover:bg-[#efa6e1] text-[#171717] rounded-full neo-border font-mono-code text-xs font-bold transition-all cursor-pointer hover:-translate-y-0.5"
                 title="Launch Budget Rescue Mode"
+                aria-label="Launch Budget Rescue Mode"
               >
                 <LifeBuoy className="w-3.5 h-3.5" />
                 <span>Rescue</span>
@@ -284,6 +298,8 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
               className="absolute inset-0 w-full h-full overflow-visible"
               viewBox="0 0 600 160"
               preserveAspectRatio="none"
+              role="img"
+              aria-label="Budget Velocity and Milestones Chart showing actual burn vs milestone targets"
             >
               <defs>
                 <linearGradient id="purpleGrad" x1="0" y1="0" x2="0" y2="1">
@@ -360,6 +376,7 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
             </div>
             <button
               onClick={() => setActiveTab('budget')}
+              aria-label="Go to full budget view"
               className="text-[#171717] font-bold flex items-center gap-1 hover:underline cursor-pointer"
             >
               Full Budget View <ChevronRight className="w-3.5 h-3.5" />
@@ -387,7 +404,16 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
           {activityMessages.map((msg) => (
             <div
               key={msg.id}
+              role="button"
+              tabIndex={0}
+              aria-label={`Open ${msg.tab}: message from ${msg.sender}: ${msg.snippet}`}
               onClick={() => setActiveTab(msg.tab)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  setActiveTab(msg.tab);
+                }
+              }}
               className="py-3 flex items-center justify-between gap-4 hover:bg-black/[0.02] -mx-2 px-2 rounded-xl transition-colors cursor-pointer group"
             >
               <div className="flex items-center gap-3.5 min-w-0">

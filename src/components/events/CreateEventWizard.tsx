@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import type { EventPlan, OccasionType, CurrencyType } from '../../types';
+import React, { useState, useEffect } from 'react';
+import type { EventPlan, OccasionType, CurrencyType, EventPreferences } from '../../types';
 import { AIGeneratorService } from '../../services/aiGenerator';
 import { StorageService } from '../../services/storage';
+import { generateId } from '../../utils/helpers';
 import {
   Sparkles,
   ArrowRight,
@@ -36,7 +37,7 @@ export const CreateEventWizard: React.FC<CreateEventWizardProps> = ({
   const [startTime, setStartTime] = useState('17:30');
   const [endTime, setEndTime] = useState('22:30');
   const [location, setLocation] = useState('Mangalore, Karnataka');
-  const [venueStatus, setVenueStatus] = useState<'booked' | 'not_booked' | 'undecided'>('booked');
+  const [venueStatus, setVenueStatus] = useState<EventPlan['venueStatus']>('booked');
 
   const [guestCount, setGuestCount] = useState<number>(250);
   const [indoorOutdoor, setIndoorOutdoor] = useState<'indoor' | 'outdoor' | 'hybrid'>('hybrid');
@@ -44,7 +45,7 @@ export const CreateEventWizard: React.FC<CreateEventWizardProps> = ({
 
   const [budgetTotal, setBudgetTotal] = useState<number>(100000);
   const [currency, setCurrency] = useState<CurrencyType>('INR');
-  const [budgetPriority, setBudgetPriority] = useState<'lowest_cost' | 'balanced_value' | 'premium_experience'>('balanced_value');
+  const [budgetPriority, setBudgetPriority] = useState<EventPreferences['budgetPriority']>('balanced_value');
 
   const [themePreference, setThemePreference] = useState('Electric Sunset Carnival');
   const [foodPreferences, setFoodPreferences] = useState('Street Food Stalls, Live Chaat, Beverages');
@@ -52,7 +53,18 @@ export const CreateEventWizard: React.FC<CreateEventWizardProps> = ({
   const [mustHaves, setMustHaves] = useState('Line-array stage sound, festival light canopy');
   const [avoid, setAvoid] = useState('Long formal speeches, expensive sit-down banquet tables');
 
-  const occasionOptions: { id: OccasionType; label: string; icon: any; desc: string }[] = [
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
+  const occasionOptions: { id: OccasionType; label: string; icon: React.ComponentType<{ className?: string }>; desc: string }[] = [
     { id: 'college_fest', label: 'College Fest', icon: GraduationCap, desc: 'Student cultural nights & tech fests' },
     { id: 'wedding', label: 'Wedding', icon: HeartHandshake, desc: 'Multi-day nuptials & royal celebrations' },
     { id: 'birthday', label: 'Birthday', icon: Cake, desc: 'Milestone jubilee & intimate birthday gatherings' },
@@ -89,7 +101,7 @@ export const CreateEventWizard: React.FC<CreateEventWizardProps> = ({
       );
 
       const newPlan: EventPlan = {
-        id: `event-${Date.now()}`,
+        id: generateId('event'),
         name,
         occasion,
         date,
@@ -157,7 +169,12 @@ export const CreateEventWizard: React.FC<CreateEventWizardProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs overflow-y-auto animate-in fade-in duration-150">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="create-wizard-title"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs overflow-y-auto animate-in fade-in duration-150"
+    >
       <div className="bg-[#FCFBF7] w-full max-w-2xl rounded-[24px] neo-border neo-shadow-lg overflow-hidden flex flex-col my-8">
         {/* Header with Step Indicator */}
         <div className="bg-[#C2F2B0] p-5 neo-border-b flex items-center justify-between">
@@ -166,7 +183,7 @@ export const CreateEventWizard: React.FC<CreateEventWizardProps> = ({
               {step}/6
             </div>
             <div>
-              <h2 className="font-mono-code text-lg font-bold text-[#171717]">
+              <h2 id="create-wizard-title" className="font-mono-code text-lg font-bold text-[#171717]">
                 Create Celebration Blueprint
               </h2>
               <p className="text-xs text-[#171717]/80">
@@ -182,6 +199,7 @@ export const CreateEventWizard: React.FC<CreateEventWizardProps> = ({
           </div>
           <button
             onClick={onClose}
+            aria-label="Close celebration wizard"
             className="p-2 hover:bg-black/10 rounded-full transition-colors cursor-pointer text-[#171717]"
           >
             <X className="w-5 h-5 stroke-[2.5]" />
@@ -204,6 +222,7 @@ export const CreateEventWizard: React.FC<CreateEventWizardProps> = ({
                     <button
                       key={opt.id}
                       type="button"
+                      aria-label={`Select ${opt.label}`}
                       onClick={() => setOccasion(opt.id)}
                       className={`p-4 rounded-xl neo-border flex flex-col items-center text-center gap-2 transition-all cursor-pointer ${
                         isSelected
@@ -232,75 +251,81 @@ export const CreateEventWizard: React.FC<CreateEventWizardProps> = ({
                 Name, Date & Location
               </h3>
               <div>
-                <label className="font-bold text-[#171717] block mb-1">
+                <label htmlFor="wizard-event-name" className="font-bold text-[#171717] block mb-1">
                   Event Title
                 </label>
                 <input
                   type="text"
+                  id="wizard-event-name"
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full bg-white p-2.5 rounded-lg neo-border focus:outline-none"
+                  className="w-full bg-white p-2.5 rounded-lg neo-border focus:outline-none focus:ring-1 focus:ring-black"
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
-                  <label className="font-bold text-[#171717] block mb-1">
+                  <label htmlFor="wizard-event-date" className="font-bold text-[#171717] block mb-1">
                     Event Date
                   </label>
                   <input
                     type="date"
+                    id="wizard-event-date"
                     required
                     value={date}
                     onChange={(e) => setDate(e.target.value)}
-                    className="w-full bg-white p-2 rounded-lg neo-border focus:outline-none font-mono-code"
+                    className="w-full bg-white p-2 rounded-lg neo-border focus:outline-none font-mono-code focus:ring-1 focus:ring-black"
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-[#171717] block mb-1">
+                  <label htmlFor="wizard-start-time" className="font-bold text-[#171717] block mb-1">
                     Start Time
                   </label>
                   <input
                     type="time"
+                    id="wizard-start-time"
                     value={startTime}
                     onChange={(e) => setStartTime(e.target.value)}
-                    className="w-full bg-white p-2 rounded-lg neo-border focus:outline-none font-mono-code"
+                    className="w-full bg-white p-2 rounded-lg neo-border focus:outline-none font-mono-code focus:ring-1 focus:ring-black"
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-[#171717] block mb-1">
+                  <label htmlFor="wizard-end-time" className="font-bold text-[#171717] block mb-1">
                     End Time
                   </label>
                   <input
                     type="time"
+                    id="wizard-end-time"
                     value={endTime}
                     onChange={(e) => setEndTime(e.target.value)}
-                    className="w-full bg-white p-2 rounded-lg neo-border focus:outline-none font-mono-code"
+                    className="w-full bg-white p-2 rounded-lg neo-border focus:outline-none font-mono-code focus:ring-1 focus:ring-black"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="font-bold text-[#171717] block mb-1">
+                  <label htmlFor="wizard-location" className="font-bold text-[#171717] block mb-1">
                     City / Venue Location
                   </label>
                   <input
                     type="text"
+                    id="wizard-location"
                     required
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
-                    className="w-full bg-white p-2.5 rounded-lg neo-border focus:outline-none"
+                    className="w-full bg-white p-2.5 rounded-lg neo-border focus:outline-none focus:ring-1 focus:ring-black"
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-[#171717] block mb-1">
+                  <label htmlFor="wizard-venue-status" className="font-bold text-[#171717] block mb-1">
                     Venue Booking Status
                   </label>
                   <select
+                    id="wizard-venue-status"
                     value={venueStatus}
-                    onChange={(e) => setVenueStatus(e.target.value as any)}
+                    onChange={(e) => setVenueStatus(e.target.value as EventPlan['venueStatus'])}
                     className="w-full bg-white p-2.5 rounded-lg neo-border focus:outline-none font-mono-code"
                   >
                     <option value="booked">Already Booked</option>
@@ -320,16 +345,17 @@ export const CreateEventWizard: React.FC<CreateEventWizardProps> = ({
               </h3>
 
               <div>
-                <label className="font-bold text-[#171717] block mb-1">
+                <label htmlFor="wizard-guest-count" className="font-bold text-[#171717] block mb-1">
                   Expected Guest Headcount
                 </label>
                 <input
                   type="number"
+                  id="wizard-guest-count"
                   min="5"
                   max="10000"
                   value={guestCount}
                   onChange={(e) => setGuestCount(Number(e.target.value))}
-                  className="w-full bg-white p-2.5 rounded-lg neo-border focus:outline-none font-mono-code font-bold text-sm"
+                  className="w-full bg-white p-2.5 rounded-lg neo-border focus:outline-none font-mono-code font-bold text-sm focus:ring-1 focus:ring-black"
                 />
               </div>
 
@@ -342,6 +368,7 @@ export const CreateEventWizard: React.FC<CreateEventWizardProps> = ({
                     <button
                       key={setting}
                       type="button"
+                      aria-label={`Setting: ${setting}`}
                       onClick={() => setIndoorOutdoor(setting)}
                       className={`p-3 rounded-lg neo-border font-mono-code text-xs font-bold capitalize cursor-pointer ${
                         indoorOutdoor === setting
@@ -364,6 +391,7 @@ export const CreateEventWizard: React.FC<CreateEventWizardProps> = ({
                     <button
                       key={atm}
                       type="button"
+                      aria-label={`Atmosphere: ${atm}`}
                       onClick={() => setAtmosphere(atm)}
                       className={`p-2 rounded-lg neo-border font-mono-code text-xs font-bold capitalize cursor-pointer ${
                         atmosphere === atm
@@ -388,25 +416,27 @@ export const CreateEventWizard: React.FC<CreateEventWizardProps> = ({
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="sm:col-span-2">
-                  <label className="font-bold text-[#171717] block mb-1">
+                  <label htmlFor="wizard-budget-total" className="font-bold text-[#171717] block mb-1">
                     Total Target Budget
                   </label>
                   <input
                     type="number"
+                    id="wizard-budget-total"
                     min="1000"
                     step="5000"
                     value={budgetTotal}
                     onChange={(e) => setBudgetTotal(Math.max(1000, Number(e.target.value)))}
-                    className="w-full bg-white p-2.5 rounded-lg neo-border focus:outline-none font-mono-code font-bold text-base"
+                    className="w-full bg-white p-2.5 rounded-lg neo-border focus:outline-none font-mono-code font-bold text-base focus:ring-1 focus:ring-black"
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-[#171717] block mb-1">
+                  <label htmlFor="wizard-currency" className="font-bold text-[#171717] block mb-1">
                     Currency
                   </label>
                   <select
+                    id="wizard-currency"
                     value={currency}
-                    onChange={(e) => setCurrency(e.target.value as any)}
+                    onChange={(e) => setCurrency(e.target.value as CurrencyType)}
                     className="w-full bg-white p-2.5 rounded-lg neo-border focus:outline-none font-mono-code font-bold"
                   >
                     <option value="INR">INR (₹)</option>
@@ -429,7 +459,8 @@ export const CreateEventWizard: React.FC<CreateEventWizardProps> = ({
                     <button
                       key={p.id}
                       type="button"
-                      onClick={() => setBudgetPriority(p.id as any)}
+                      aria-label={`Priority: ${p.label}`}
+                      onClick={() => setBudgetPriority(p.id as EventPreferences['budgetPriority'])}
                       className={`p-3 rounded-xl neo-border text-left cursor-pointer transition-all ${
                         budgetPriority === p.id
                           ? 'bg-[#F4BCE8] neo-shadow-sm border-[#171717]'
@@ -455,68 +486,73 @@ export const CreateEventWizard: React.FC<CreateEventWizardProps> = ({
               </h3>
 
               <div>
-                <label className="font-bold text-[#171717] block mb-1">
+                <label htmlFor="wizard-theme-preference" className="font-bold text-[#171717] block mb-1">
                   Preferred Theme or Aesthetic Concept
                 </label>
                 <input
                   type="text"
+                  id="wizard-theme-preference"
                   value={themePreference}
                   onChange={(e) => setThemePreference(e.target.value)}
                   placeholder="e.g. Electric Sunset Carnival, Minimalist Sage & Ivory"
-                  className="w-full bg-white p-2.5 rounded-lg neo-border focus:outline-none"
+                  className="w-full bg-white p-2.5 rounded-lg neo-border focus:outline-none focus:ring-1 focus:ring-black"
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="font-bold text-[#171717] block mb-1">
+                  <label htmlFor="wizard-food-preferences" className="font-bold text-[#171717] block mb-1">
                     Food Preferences
                   </label>
                   <input
                     type="text"
+                    id="wizard-food-preferences"
                     value={foodPreferences}
                     onChange={(e) => setFoodPreferences(e.target.value)}
                     placeholder="e.g. Street food stalls, Dosa counter"
-                    className="w-full bg-white p-2 rounded-lg neo-border focus:outline-none"
+                    className="w-full bg-white p-2 rounded-lg neo-border focus:outline-none focus:ring-1 focus:ring-black"
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-[#171717] block mb-1">
+                  <label htmlFor="wizard-dietary-requirements" className="font-bold text-[#171717] block mb-1">
                     Dietary Requirements
                   </label>
                   <input
                     type="text"
+                    id="wizard-dietary-requirements"
                     value={dietaryRequirements}
                     onChange={(e) => setDietaryRequirements(e.target.value)}
                     placeholder="e.g. Strict veg separation, Jain options"
-                    className="w-full bg-white p-2 rounded-lg neo-border focus:outline-none"
+                    className="w-full bg-white p-2 rounded-lg neo-border focus:outline-none focus:ring-1 focus:ring-black"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="font-bold text-[#171717] block mb-1">
+                  <label htmlFor="wizard-must-haves" className="font-bold text-[#171717] block mb-1">
                     Must-Have Activities
                   </label>
                   <input
                     type="text"
+                    id="wizard-must-haves"
                     value={mustHaves}
                     onChange={(e) => setMustHaves(e.target.value)}
                     placeholder="e.g. Band performance, photo wall"
-                    className="w-full bg-white p-2 rounded-lg neo-border focus:outline-none"
+                    className="w-full bg-white p-2 rounded-lg neo-border focus:outline-none focus:ring-1 focus:ring-black"
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-[#171717] block mb-1">
+                  <label htmlFor="wizard-avoid" className="font-bold text-[#171717] block mb-1">
                     Things to Avoid
                   </label>
                   <input
                     type="text"
+                    id="wizard-avoid"
                     value={avoid}
                     onChange={(e) => setAvoid(e.target.value)}
                     placeholder="e.g. Long speeches, plastic cutlery"
-                    className="w-full bg-white p-2 rounded-lg neo-border focus:outline-none"
+                    className="w-full bg-white p-2 rounded-lg neo-border focus:outline-none focus:ring-1 focus:ring-black"
                   />
                 </div>
               </div>

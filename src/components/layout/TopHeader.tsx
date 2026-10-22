@@ -38,7 +38,8 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
             <select
               value={activeEvent.id}
               onChange={(e) => onSelectEvent(e.target.value)}
-              className="appearance-none bg-[#FDF189] text-[#171717] font-mono-code text-xs font-bold px-2.5 py-1 pr-6 rounded-lg neo-border cursor-pointer hover:bg-[#F5E25E] transition-colors focus:outline-none"
+              aria-label="Select active celebration"
+              className="appearance-none bg-[#FDF189] text-[#171717] font-mono-code text-xs font-bold px-2.5 py-1 pr-6 rounded-lg neo-border cursor-pointer hover:bg-[#F5E25E] transition-colors focus:outline-none focus:ring-1 focus:ring-black"
             >
               {events.map((ev) => (
                 <option key={ev.id} value={ev.id}>
@@ -60,6 +61,7 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            aria-label="Search events, tasks, vendors, and guests"
             placeholder="Search anything..."
             className="w-full bg-white text-xs font-medium text-[#171717] pl-9 pr-3.5 py-2 rounded-full neo-border focus:outline-none focus:ring-2 focus:ring-[#171717]/20 placeholder:text-[#565656]"
           />
@@ -69,6 +71,7 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
         <button
           onClick={openBudgetRescue}
           title="Activate Budget Rescue Mode"
+          aria-label="Activate Budget Rescue Mode"
           className="flex items-center gap-1.5 px-3 py-2 bg-[#F4BCE8] text-[#171717] rounded-full neo-border neo-shadow-sm font-mono-code text-xs font-bold hover:bg-[#EEA8DF] transition-all cursor-pointer hover:-translate-y-0.5 active:translate-y-0"
         >
           <LifeBuoy className="w-3.5 h-3.5 stroke-[2.5]" />
@@ -78,6 +81,7 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
         {/* Primary Create Event button */}
         <button
           onClick={openCreateWizard}
+          aria-label="Create New Event"
           className="flex items-center gap-1.5 px-3.5 py-2 bg-[#171717] text-white rounded-full font-mono-code text-xs font-bold neo-shadow-sm hover:bg-[#2b2b2b] transition-all cursor-pointer hover:-translate-y-0.5 active:translate-y-0"
         >
           <Plus className="w-3.5 h-3.5 stroke-[2.5]" />

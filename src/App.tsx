@@ -174,6 +174,14 @@ export function App() {
 
   return (
     <div className="min-h-screen bg-[#F0E5FD] p-2 sm:p-4 lg:p-6 flex items-center justify-center relative overflow-hidden select-text">
+      {/* Skip to Main Content Link for Keyboard and Screen Reader Accessibility */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:px-4 focus:py-2 focus:bg-[#171717] focus:text-[#C2F2B0] focus:rounded-xl focus:font-mono-code focus:text-xs font-bold neo-shadow-sm focus:outline-none"
+      >
+        Skip to main content
+      </a>
+
       {/* Neo-Brutalist Outer Pastel Geometry (Reference Background) */}
       <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-[#FFC29E]/30 blur-2xl pointer-events-none"></div>
       <div className="absolute -bottom-24 -right-24 w-96 h-96 rounded-full bg-[#62C5F3]/25 blur-2xl pointer-events-none"></div>
@@ -193,7 +201,7 @@ export function App() {
         />
 
         {/* Central Main Workspace */}
-        <main className="flex-1 bg-white p-5 sm:p-7 lg:p-8 flex flex-col overflow-y-auto">
+        <main id="main-content" tabIndex={-1} className="flex-1 bg-white p-5 sm:p-7 lg:p-8 flex flex-col overflow-y-auto outline-none">
           {/* Top Header Bar */}
           <TopHeader
             events={events}
@@ -214,6 +222,7 @@ export function App() {
                 </span>
                 <button
                   onClick={() => setSearchQuery('')}
+                  aria-label="Clear Search"
                   className="text-xs font-mono-code text-[#565656] hover:text-black flex items-center gap-1 cursor-pointer"
                 >
                   <X className="w-3.5 h-3.5" /> Clear Search

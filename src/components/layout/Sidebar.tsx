@@ -43,6 +43,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <button
           onClick={() => setActiveTab('overview')}
           title="Celebrato Home"
+          aria-label="Celebrato Home Dashboard"
           className="w-12 h-12 bg-white rounded-2xl neo-border neo-shadow-sm flex items-center justify-center hover:scale-105 transition-transform cursor-pointer group"
         >
           {/* Custom Stylized Logo Glyph matching reference */}
@@ -57,7 +58,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* Middle Nav Items */}
-      <nav className="flex lg:flex-col items-center gap-2 lg:gap-3 overflow-x-auto lg:overflow-visible py-1">
+      <nav aria-label="Main Navigation" className="flex lg:flex-col items-center gap-2 lg:gap-3 overflow-x-auto lg:overflow-visible py-1">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
@@ -67,6 +68,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
               key={item.id}
               onClick={() => setActiveTab(item.id)}
               title={item.label}
+              aria-label={item.label}
+              aria-current={isActive ? 'page' : undefined}
               className={`relative p-3 rounded-xl transition-all cursor-pointer flex items-center justify-center group ${
                 isActive
                   ? 'bg-[#171717] text-[#C2F2B0] neo-shadow-sm scale-105'
@@ -93,6 +96,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <button
           onClick={openCreateWizard}
           title="Create New Event"
+          aria-label="Create New Event"
           className="p-3 bg-[#FFD95A] text-[#171717] rounded-xl neo-border neo-shadow-sm hover:scale-105 transition-transform cursor-pointer"
         >
           <PlusCircle className="w-5 h-5 stroke-[2.2]" />
@@ -104,6 +108,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <button
           onClick={openSettings}
           title="Settings & Gemini AI Key"
+          aria-label="Settings & Gemini AI Key"
           className="p-3 rounded-xl text-[#171717] hover:bg-black/10 transition-colors cursor-pointer group relative"
         >
           <Settings className="w-5 h-5 stroke-[2] group-hover:rotate-45 transition-transform" />

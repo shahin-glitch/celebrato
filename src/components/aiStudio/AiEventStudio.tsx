@@ -126,6 +126,7 @@ export const AiEventStudio: React.FC<AiEventStudioProps> = ({
         <div className="flex items-center gap-2">
           <button
             onClick={openBudgetRescue}
+            aria-label="Launch Budget Rescue Mode"
             className="flex items-center gap-1.5 px-3 py-2 bg-[#F4BCE8] text-[#171717] rounded-xl neo-border font-mono-code text-xs font-bold hover:bg-[#EEA8DF] cursor-pointer"
           >
             <LifeBuoy className="w-4 h-4" />
@@ -134,6 +135,7 @@ export const AiEventStudio: React.FC<AiEventStudioProps> = ({
           <button
             onClick={handleSimulateRegenerate}
             disabled={isRegenerating}
+            aria-label="Refresh AI Plan"
             className="flex items-center gap-1.5 px-3.5 py-2 bg-[#171717] text-white rounded-xl font-mono-code text-xs font-bold hover:bg-[#2b2b2b] cursor-pointer disabled:opacity-50"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isRegenerating ? 'animate-spin' : ''}`} />
@@ -143,20 +145,24 @@ export const AiEventStudio: React.FC<AiEventStudioProps> = ({
       </div>
 
       {/* Sub Tabs */}
-      <div className="flex items-center gap-2 border-b border-[#171717]/10 pb-2 overflow-x-auto">
+      <div role="tablist" aria-label="AI Event Studio Blueprint Views" className="flex items-center gap-2 border-b border-[#171717]/10 pb-2 overflow-x-auto">
         {[
-          { id: 'concept', label: '1. Event Concept & Style', icon: Palette },
-          { id: 'budget', label: '2. Intelligent Budget', icon: DollarSign },
-          { id: 'timeline', label: '3. Timeline Milestones', icon: CalendarCheck },
-          { id: 'vendors', label: '4. Tailored Vendor Checklist', icon: Tag },
-          { id: 'recommendations', label: '5. Smart Recommendations', icon: Lightbulb },
+          { id: 'concept' as const, label: '1. Event Concept & Style', icon: Palette },
+          { id: 'budget' as const, label: '2. Intelligent Budget', icon: DollarSign },
+          { id: 'timeline' as const, label: '3. Timeline Milestones', icon: CalendarCheck },
+          { id: 'vendors' as const, label: '4. Tailored Vendor Checklist', icon: Tag },
+          { id: 'recommendations' as const, label: '5. Smart Recommendations', icon: Lightbulb },
         ].map((tab) => {
           const Icon = tab.icon;
           const isActive = activeSubTab === tab.id;
           return (
             <button
               key={tab.id}
-              onClick={() => setActiveSubTab(tab.id as any)}
+              role="tab"
+              id={`studio-tab-${tab.id}`}
+              aria-selected={isActive}
+              aria-controls={`studio-panel-${tab.id}`}
+              onClick={() => setActiveSubTab(tab.id)}
               className={`flex items-center gap-2 px-4 py-2 rounded-xl font-mono-code text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
                 isActive
                   ? 'bg-[#171717] text-white neo-shadow-sm'
@@ -172,7 +178,12 @@ export const AiEventStudio: React.FC<AiEventStudioProps> = ({
 
       {/* SUB-TAB 1: EVENT CONCEPT */}
       {activeSubTab === 'concept' && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div
+          role="tabpanel"
+          id="studio-panel-concept"
+          aria-labelledby="studio-tab-concept"
+          className="grid grid-cols-1 lg:grid-cols-12 gap-6"
+        >
           {/* Main Concept Card */}
           <div className="lg:col-span-8 bg-white p-6 rounded-2xl neo-border neo-shadow-sm space-y-6">
             <div>
@@ -196,6 +207,7 @@ export const AiEventStudio: React.FC<AiEventStudioProps> = ({
                 {event.concept.colorPalette.map((color, idx) => (
                   <div key={idx} className="flex flex-col items-center gap-1">
                     <div
+                      aria-label={`Color swatch ${color}`}
                       className="w-12 h-12 rounded-xl neo-border shadow-xs"
                       style={{ backgroundColor: color }}
                     ></div>
@@ -286,7 +298,12 @@ export const AiEventStudio: React.FC<AiEventStudioProps> = ({
 
       {/* SUB-TAB 2: INTELLIGENT BUDGET */}
       {activeSubTab === 'budget' && (
-        <div className="bg-white p-6 rounded-2xl neo-border neo-shadow-sm space-y-6">
+        <div
+          role="tabpanel"
+          id="studio-panel-budget"
+          aria-labelledby="studio-tab-budget"
+          className="bg-white p-6 rounded-2xl neo-border neo-shadow-sm space-y-6"
+        >
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-black/10">
             <div>
               <h3 className="font-mono-code text-lg font-bold text-[#171717]">
@@ -309,6 +326,7 @@ export const AiEventStudio: React.FC<AiEventStudioProps> = ({
               </div>
               <button
                 onClick={handleRebalanceBudget}
+                aria-label="Rebalance category budget amounts"
                 className="px-3 py-1.5 bg-[#FDF189] text-[#171717] rounded-xl neo-border font-mono-code text-xs font-bold hover:bg-[#F5E25E] cursor-pointer"
               >
                 Rebalance
@@ -350,11 +368,12 @@ export const AiEventStudio: React.FC<AiEventStudioProps> = ({
                       <span>{currency}</span>
                       <input
                         type="number"
+                        aria-label={`${cat.name} allocated amount`}
                         value={cat.amount}
                         onChange={(e) =>
                           handleUpdateCategoryAmount(cat.id, Number(e.target.value))
                         }
-                        className="w-24 px-2 py-1 bg-white border border-[#171717] rounded-lg text-right font-mono-code focus:outline-none"
+                        className="w-24 px-2 py-1 bg-white border border-[#171717] rounded-lg text-right font-mono-code focus:outline-none focus:ring-1 focus:ring-black"
                       />
                     </div>
                   </div>
@@ -363,7 +382,14 @@ export const AiEventStudio: React.FC<AiEventStudioProps> = ({
                 <p className="text-xs text-[#565656] mt-2">{cat.reason}</p>
 
                 {/* Progress bar */}
-                <div className="w-full h-2 bg-gray-200 rounded-full mt-3 overflow-hidden">
+                <div
+                  role="progressbar"
+                  aria-valuenow={cat.percentage}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-label={`${cat.name} percentage of total budget: ${cat.percentage}%`}
+                  className="w-full h-2 bg-gray-200 rounded-full mt-3 overflow-hidden"
+                >
                   <div
                     className="h-full bg-[#171717] rounded-full transition-all"
                     style={{ width: `${Math.min(100, cat.percentage)}%` }}
@@ -377,7 +403,12 @@ export const AiEventStudio: React.FC<AiEventStudioProps> = ({
 
       {/* SUB-TAB 3: TIMELINE MILESTONES */}
       {activeSubTab === 'timeline' && (
-        <div className="bg-white p-6 rounded-2xl neo-border neo-shadow-sm space-y-4">
+        <div
+          role="tabpanel"
+          id="studio-panel-timeline"
+          aria-labelledby="studio-tab-timeline"
+          className="bg-white p-6 rounded-2xl neo-border neo-shadow-sm space-y-4"
+        >
           <div className="flex items-center justify-between pb-3 border-b border-black/10">
             <div>
               <h3 className="font-mono-code text-lg font-bold text-[#171717]">
@@ -396,7 +427,17 @@ export const AiEventStudio: React.FC<AiEventStudioProps> = ({
             {event.timeline.map((task) => (
               <div
                 key={task.id}
+                role="checkbox"
+                aria-checked={task.completed}
+                tabIndex={0}
+                aria-label={`Mark task ${task.title} as ${task.completed ? 'pending' : 'completed'}`}
                 onClick={() => handleToggleTask(task.id)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleToggleTask(task.id);
+                  }
+                }}
                 className={`p-4 rounded-xl neo-border flex items-start gap-3 cursor-pointer transition-all ${
                   task.completed
                     ? 'bg-[#C2F2B0]/30 border-black/30'
@@ -449,7 +490,12 @@ export const AiEventStudio: React.FC<AiEventStudioProps> = ({
 
       {/* SUB-TAB 4: TAILORED VENDOR CHECKLIST */}
       {activeSubTab === 'vendors' && (
-        <div className="bg-white p-6 rounded-2xl neo-border neo-shadow-sm space-y-4">
+        <div
+          role="tabpanel"
+          id="studio-panel-vendors"
+          aria-labelledby="studio-tab-vendors"
+          className="bg-white p-6 rounded-2xl neo-border neo-shadow-sm space-y-4"
+        >
           <div className="pb-3 border-b border-black/10">
             <h3 className="font-mono-code text-lg font-bold text-[#171717]">
               Tailored Vendor Procurement Checklist
@@ -506,7 +552,12 @@ export const AiEventStudio: React.FC<AiEventStudioProps> = ({
 
       {/* SUB-TAB 5: RECOMMENDATIONS */}
       {activeSubTab === 'recommendations' && (
-        <div className="bg-white p-6 rounded-2xl neo-border neo-shadow-sm space-y-4">
+        <div
+          role="tabpanel"
+          id="studio-panel-recommendations"
+          aria-labelledby="studio-tab-recommendations"
+          className="bg-white p-6 rounded-2xl neo-border neo-shadow-sm space-y-4"
+        >
           <div className="pb-3 border-b border-black/10">
             <h3 className="font-mono-code text-lg font-bold text-[#171717]">
               Personalized Recommendations & Alternatives

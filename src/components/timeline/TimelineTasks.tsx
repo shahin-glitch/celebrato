@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { EventPlan, TimelineTask } from '../../types';
+import { generateId } from '../../utils/helpers';
 import {
   CalendarCheck,
   CheckCircle2,
@@ -9,6 +10,7 @@ import {
   Clock,
   Filter,
   CheckSquare,
+  X,
 } from 'lucide-react';
 
 interface TimelineTasksProps {
@@ -28,9 +30,20 @@ export const TimelineTasks: React.FC<TimelineTasksProps> = ({
   const [newTitle, setNewTitle] = useState('');
   const [newDueDate, setNewDueDate] = useState(event.date);
   const [newTimeSlot, setNewTimeSlot] = useState('11:00 AM');
-  const [newPriority, setNewPriority] = useState<'high' | 'medium' | 'low'>('medium');
+  const [newPriority, setNewPriority] = useState<TimelineTask['priority']>('medium');
   const [newCategory, setNewCategory] = useState('Production');
   const [newNotes, setNewNotes] = useState('');
+
+  useEffect(() => {
+    if (!showAddModal) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setShowAddModal(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showAddModal]);
 
   const categories = Array.from(
     new Set(event.timeline.map((t) => t.category).filter(Boolean))
@@ -53,7 +66,7 @@ export const TimelineTasks: React.FC<TimelineTasksProps> = ({
     if (!newTitle.trim()) return;
 
     const newTask: TimelineTask = {
-      id: `task-${Date.now()}`,
+      id: generateId('task'),
       title: newTitle.trim(),
       dueDate: newDueDate,
       timeSlot: newTimeSlot,
@@ -102,6 +115,7 @@ export const TimelineTasks: React.FC<TimelineTasksProps> = ({
 
         <button
           onClick={() => setShowAddModal(true)}
+          aria-label="Add Custom Task"
           className="flex items-center gap-1.5 px-4 py-2.5 bg-[#171717] text-white rounded-xl neo-shadow-sm font-mono-code text-xs font-bold hover:bg-[#2b2b2b] cursor-pointer"
         >
           <Plus className="w-4 h-4" />
@@ -137,8 +151,9 @@ export const TimelineTasks: React.FC<TimelineTasksProps> = ({
             <Filter className="w-3.5 h-3.5 text-[#565656]" />
             <select
               value={filterCategory}
+              aria-label="Filter tasks by category"
               onChange={(e) => setFilterCategory(e.target.value)}
-              className="bg-white font-mono-code text-xs font-bold px-2.5 py-1.5 rounded-lg neo-border focus:outline-none"
+              className="bg-white font-mono-code text-xs font-bold px-2.5 py-1.5 rounded-lg neo-border focus:outline-none focus:ring-1 focus:ring-black"
             >
               <option value="all">All Categories</option>
               {categories.map((c) => (
@@ -169,7 +184,17 @@ export const TimelineTasks: React.FC<TimelineTasksProps> = ({
               }`}
             >
               <div
+                role="checkbox"
+                aria-checked={task.completed}
+                tabIndex={0}
+                aria-label={`Mark task ${task.title} as ${task.completed ? 'pending' : 'completed'}`}
                 onClick={() => toggleTask(task.id)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    toggleTask(task.id);
+                  }
+                }}
                 className="flex items-start gap-3 flex-1 cursor-pointer"
               >
                 <div className="mt-0.5 shrink-0">
@@ -222,6 +247,7 @@ export const TimelineTasks: React.FC<TimelineTasksProps> = ({
                   onClick={() => deleteTask(task.id)}
                   className="p-1 text-gray-400 hover:text-red-600 transition-colors cursor-pointer"
                   title="Delete Task"
+                  aria-label={`Delete task ${task.title}`}
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -233,71 +259,92 @@ export const TimelineTasks: React.FC<TimelineTasksProps> = ({
 
       {/* Add Task Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="add-task-modal-title"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-150"
+        >
           <div className="bg-[#FCFBF7] w-full max-w-lg rounded-2xl neo-border neo-shadow-lg p-6 space-y-4">
-            <h3 className="font-mono-code text-lg font-bold text-[#171717]">
-              Add Custom Milestone Task
-            </h3>
+            <div className="flex items-center justify-between pb-2 border-b border-black/10">
+              <h3 id="add-task-modal-title" className="font-mono-code text-lg font-bold text-[#171717]">
+                Add Custom Milestone Task
+              </h3>
+              <button
+                type="button"
+                onClick={() => setShowAddModal(false)}
+                aria-label="Close add task modal"
+                className="p-1 hover:bg-black/10 rounded-full cursor-pointer text-[#171717]"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
             <form onSubmit={handleAddTask} className="space-y-4 text-xs">
               <div>
-                <label className="font-bold text-[#171717] block mb-1">
+                <label htmlFor="task-title" className="font-bold text-[#171717] block mb-1">
                   Task Title
                 </label>
                 <input
                   type="text"
+                  id="task-title"
                   required
                   placeholder="e.g. Confirm acoustic sound-check schedule"
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
-                  className="w-full bg-white p-2.5 rounded-lg neo-border focus:outline-none"
+                  className="w-full bg-white p-2.5 rounded-lg neo-border focus:outline-none focus:ring-1 focus:ring-black"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="font-bold text-[#171717] block mb-1">
+                  <label htmlFor="task-due-date" className="font-bold text-[#171717] block mb-1">
                     Due Date
                   </label>
                   <input
                     type="date"
+                    id="task-due-date"
                     required
                     value={newDueDate}
                     onChange={(e) => setNewDueDate(e.target.value)}
-                    className="w-full bg-white p-2 rounded-lg neo-border focus:outline-none font-mono-code"
+                    className="w-full bg-white p-2 rounded-lg neo-border focus:outline-none font-mono-code focus:ring-1 focus:ring-black"
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-[#171717] block mb-1">
+                  <label htmlFor="task-time-slot" className="font-bold text-[#171717] block mb-1">
                     Time Slot
                   </label>
                   <input
                     type="text"
+                    id="task-time-slot"
                     value={newTimeSlot}
                     onChange={(e) => setNewTimeSlot(e.target.value)}
-                    className="w-full bg-white p-2 rounded-lg neo-border focus:outline-none font-mono-code"
+                    className="w-full bg-white p-2 rounded-lg neo-border focus:outline-none font-mono-code focus:ring-1 focus:ring-black"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="font-bold text-[#171717] block mb-1">
+                  <label htmlFor="task-category" className="font-bold text-[#171717] block mb-1">
                     Category
                   </label>
                   <input
                     type="text"
+                    id="task-category"
                     value={newCategory}
                     onChange={(e) => setNewCategory(e.target.value)}
-                    className="w-full bg-white p-2 rounded-lg neo-border focus:outline-none"
+                    className="w-full bg-white p-2 rounded-lg neo-border focus:outline-none focus:ring-1 focus:ring-black"
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-[#171717] block mb-1">
+                  <label htmlFor="task-priority" className="font-bold text-[#171717] block mb-1">
                     Priority
                   </label>
                   <select
+                    id="task-priority"
                     value={newPriority}
-                    onChange={(e) => setNewPriority(e.target.value as any)}
+                    onChange={(e) => setNewPriority(e.target.value as TimelineTask['priority'])}
                     className="w-full bg-white p-2 rounded-lg neo-border focus:outline-none font-mono-code"
                   >
                     <option value="high">High</option>
@@ -308,15 +355,16 @@ export const TimelineTasks: React.FC<TimelineTasksProps> = ({
               </div>
 
               <div>
-                <label className="font-bold text-[#171717] block mb-1">
+                <label htmlFor="task-notes" className="font-bold text-[#171717] block mb-1">
                   Notes / Details
                 </label>
                 <textarea
+                  id="task-notes"
                   rows={2}
                   placeholder="Optional logistical notes or contacts..."
                   value={newNotes}
                   onChange={(e) => setNewNotes(e.target.value)}
-                  className="w-full bg-white p-2.5 rounded-lg neo-border focus:outline-none"
+                  className="w-full bg-white p-2.5 rounded-lg neo-border focus:outline-none focus:ring-1 focus:ring-black"
                 />
               </div>
 

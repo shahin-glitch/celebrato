@@ -1,15 +1,12 @@
 import React, { useState } from 'react';
 import type { EventPlan, BudgetCategory } from '../../types';
+import { generateId } from '../../utils/helpers';
 import {
-  Wallet,
   Plus,
   Trash2,
   Lock,
   Unlock,
   LifeBuoy,
-  RefreshCw,
-  AlertCircle,
-  TrendingDown,
   Sparkles,
 } from 'lucide-react';
 
@@ -83,7 +80,7 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({
     if (!newCatName.trim()) return;
 
     const newCat: BudgetCategory = {
-      id: `cat-${Date.now()}`,
+      id: generateId('cat'),
       name: newCatName.trim(),
       amount: newCatAmount,
       percentage: Math.round((newCatAmount / totalBudget) * 100),
@@ -129,6 +126,7 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({
 
         <button
           onClick={openBudgetRescue}
+          aria-label="Launch Rescue Mode"
           className="flex items-center gap-2 px-4 py-2.5 bg-[#171717] text-white rounded-xl neo-shadow-sm font-mono-code text-xs font-bold hover:bg-[#2b2b2b] cursor-pointer hover:-translate-y-0.5 transition-all whitespace-nowrap"
         >
           <Sparkles className="w-4 h-4 text-[#FFD95A]" />
@@ -196,6 +194,11 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({
                         ? 'Category Protected from Rescue cuts'
                         : 'Click to protect category from cuts'
                     }
+                    aria-label={
+                      cat.isProtected
+                        ? `Unlock ${cat.name} category`
+                        : `Lock ${cat.name} category from cuts`
+                    }
                     className={`p-1.5 rounded-lg neo-border cursor-pointer transition-colors ${
                       cat.isProtected
                         ? 'bg-[#C2F2B0] text-[#171717]'
@@ -227,11 +230,12 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({
                     <span>{currency}</span>
                     <input
                       type="number"
+                      aria-label={`${cat.name} amount`}
                       value={cat.amount}
                       onChange={(e) =>
                         handleUpdateAmount(cat.id, Number(e.target.value))
                       }
-                      className="w-28 px-2 py-1 bg-white border border-[#171717] rounded-lg text-right font-mono-code focus:outline-none"
+                      className="w-28 px-2 py-1 bg-white border border-[#171717] rounded-lg text-right font-mono-code focus:outline-none focus:ring-1 focus:ring-black"
                     />
                   </div>
 
@@ -239,14 +243,22 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({
                     onClick={() => handleDeleteCategory(cat.id)}
                     className="p-1.5 text-[#565656] hover:text-red-600 cursor-pointer"
                     title="Delete Category"
+                    aria-label={`Delete ${cat.name} category`}
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
               </div>
 
-              {/* Progress Bar */}
-              <div className="w-full h-2 bg-gray-200 rounded-full mt-3 overflow-hidden">
+              {/* Progress Bar with ARIA */}
+              <div
+                role="progressbar"
+                aria-valuenow={cat.percentage}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-label={`${cat.name} allocation: ${cat.percentage}%`}
+                className="w-full h-2 bg-gray-200 rounded-full mt-3 overflow-hidden"
+              >
                 <div
                   className="h-full bg-[#171717] rounded-full"
                   style={{ width: `${Math.min(100, cat.percentage)}%` }}
@@ -264,21 +276,24 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({
           <input
             type="text"
             placeholder="New Category Name (e.g. Return Gifts)"
+            aria-label="New Category Name"
             value={newCatName}
             onChange={(e) => setNewCatName(e.target.value)}
-            className="flex-1 bg-white px-3 py-2 rounded-lg neo-border text-xs focus:outline-none"
+            className="flex-1 bg-white px-3 py-2 rounded-lg neo-border text-xs focus:outline-none focus:ring-1 focus:ring-black"
           />
           <div className="flex items-center gap-1 font-mono-code text-xs">
             <span>{currency}</span>
             <input
               type="number"
+              aria-label="New Category Amount"
               value={newCatAmount}
               onChange={(e) => setNewCatAmount(Number(e.target.value))}
-              className="w-28 bg-white px-2 py-2 rounded-lg neo-border text-right focus:outline-none"
+              className="w-28 bg-white px-2 py-2 rounded-lg neo-border text-right focus:outline-none focus:ring-1 focus:ring-black"
             />
           </div>
           <button
             type="submit"
+            aria-label="Add Category"
             className="flex items-center gap-1.5 px-4 py-2 bg-[#171717] text-white rounded-lg font-mono-code text-xs font-bold hover:bg-[#2b2b2b] cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />

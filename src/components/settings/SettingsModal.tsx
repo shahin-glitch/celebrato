@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StorageService } from '../../services/storage';
 import type { CurrencyType } from '../../types';
 import {
@@ -8,9 +8,6 @@ import {
   DollarSign,
   RotateCcw,
   Download,
-  ShieldCheck,
-  Check,
-  Sparkles,
 } from 'lucide-react';
 
 interface SettingsModalProps {
@@ -30,6 +27,17 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 }) => {
   const [apiKey, setApiKey] = useState(StorageService.getApiKey());
   const [savedSuccess, setSavedSuccess] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -52,7 +60,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs overflow-y-auto animate-in fade-in duration-150">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="settings-modal-title"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs overflow-y-auto animate-in fade-in duration-150"
+    >
       <div className="bg-[#FCFBF7] w-full max-w-lg rounded-[24px] neo-border neo-shadow-lg p-6 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between pb-3 border-b border-black/10">
@@ -60,12 +73,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             <span className="w-8 h-8 rounded-xl bg-[#FDF189] neo-border flex items-center justify-center text-[#171717]">
               <Settings className="w-4 h-4 stroke-[2.2]" />
             </span>
-            <h2 className="font-mono-code text-lg font-bold text-[#171717]">
+            <h2 id="settings-modal-title" className="font-mono-code text-lg font-bold text-[#171717]">
               Settings & AI Engine
             </h2>
           </div>
           <button
             onClick={onClose}
+            aria-label="Close settings"
             className="p-1.5 hover:bg-black/10 rounded-full cursor-pointer text-[#171717]"
           >
             <X className="w-5 h-5 stroke-[2.5]" />
@@ -89,6 +103,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           <form onSubmit={handleSaveApiKey} className="flex gap-2">
             <input
               type="password"
+              id="gemini-api-key"
+              aria-label="Google Gemini API Key"
               placeholder="AIzaSy..."
               value={apiKey}
               onChange={(e) => setApiKey(e.target.value)}

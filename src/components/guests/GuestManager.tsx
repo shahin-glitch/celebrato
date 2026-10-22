@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { EventPlan, Guest } from '../../types';
+import { generateId } from '../../utils/helpers';
 import {
   Users,
   UserPlus,
@@ -10,6 +11,7 @@ import {
   Trash2,
   Download,
   Utensils,
+  X,
 } from 'lucide-react';
 
 interface GuestManagerProps {
@@ -34,6 +36,17 @@ export const GuestManager: React.FC<GuestManagerProps> = ({
   const [rsvpStatus, setRsvpStatus] = useState<Guest['rsvpStatus']>('attending');
   const [dietary, setDietary] = useState('No restrictions');
   const [tableGroup, setTableGroup] = useState('');
+
+  useEffect(() => {
+    if (!showAddModal) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setShowAddModal(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showAddModal]);
 
   const attendingCount = event.guests
     .filter((g) => g.rsvpStatus === 'attending')
@@ -68,7 +81,7 @@ export const GuestManager: React.FC<GuestManagerProps> = ({
     if (!name.trim()) return;
 
     const newGuest: Guest = {
-      id: `gst-${Date.now()}`,
+      id: generateId('gst'),
       name: name.trim(),
       group: group.trim() || 'General',
       email: email.trim() || undefined,
@@ -148,6 +161,7 @@ export const GuestManager: React.FC<GuestManagerProps> = ({
         <div className="flex items-center gap-2">
           <button
             onClick={handleExportCSV}
+            aria-label="Export guest list as CSV"
             className="flex items-center gap-1.5 px-3 py-2 bg-white text-[#171717] rounded-xl neo-border font-mono-code text-xs font-bold hover:bg-black/5 cursor-pointer"
           >
             <Download className="w-3.5 h-3.5" />
@@ -155,6 +169,7 @@ export const GuestManager: React.FC<GuestManagerProps> = ({
           </button>
           <button
             onClick={() => setShowAddModal(true)}
+            aria-label="Add Guest"
             className="flex items-center gap-1.5 px-4 py-2 bg-[#171717] text-white rounded-xl neo-shadow-sm font-mono-code text-xs font-bold hover:bg-[#2b2b2b] cursor-pointer"
           >
             <UserPlus className="w-4 h-4" />
@@ -196,7 +211,14 @@ export const GuestManager: React.FC<GuestManagerProps> = ({
               {attendingCount} / {cateringCapacity}
             </span>
           </div>
-          <div className="w-full h-2.5 bg-gray-200 rounded-full overflow-hidden">
+          <div
+            role="progressbar"
+            aria-valuenow={capacityPercent}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label={`Catering capacity usage: ${capacityPercent}%`}
+            className="w-full h-2.5 bg-gray-200 rounded-full overflow-hidden"
+          >
             <div
               className={`h-full rounded-full ${
                 capacityPercent > 90 ? 'bg-amber-500' : 'bg-[#171717]'
@@ -214,9 +236,10 @@ export const GuestManager: React.FC<GuestManagerProps> = ({
           <input
             type="text"
             placeholder="Search by name, group, or table..."
+            aria-label="Search guests by name, group, or table"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-white pl-9 pr-3 py-2 rounded-xl neo-border text-xs focus:outline-none"
+            className="w-full bg-white pl-9 pr-3 py-2 rounded-xl neo-border text-xs focus:outline-none focus:ring-1 focus:ring-black"
           />
         </div>
 
@@ -279,8 +302,9 @@ export const GuestManager: React.FC<GuestManagerProps> = ({
               <div className="flex items-center gap-3 shrink-0 self-end sm:self-center">
                 <select
                   value={guest.rsvpStatus}
+                  aria-label={`RSVP status for ${guest.name}`}
                   onChange={(e) =>
-                    handleUpdateStatus(guest.id, e.target.value as any)
+                    handleUpdateStatus(guest.id, e.target.value as Guest['rsvpStatus'])
                   }
                   className={`font-mono-code text-xs font-bold px-2.5 py-1 rounded-lg neo-border focus:outline-none cursor-pointer ${
                     guest.rsvpStatus === 'attending'
@@ -299,6 +323,7 @@ export const GuestManager: React.FC<GuestManagerProps> = ({
                   onClick={() => handleDeleteGuest(guest.id)}
                   className="p-1.5 text-gray-400 hover:text-red-600 cursor-pointer"
                   title="Remove Guest"
+                  aria-label={`Delete guest ${guest.name}`}
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -310,58 +335,78 @@ export const GuestManager: React.FC<GuestManagerProps> = ({
 
       {/* Add Guest Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="add-guest-modal-title"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-150"
+        >
           <div className="bg-[#FCFBF7] w-full max-w-lg rounded-2xl neo-border neo-shadow-lg p-6 space-y-4">
-            <h3 className="font-mono-code text-lg font-bold text-[#171717]">
-              Add Guest / Group
-            </h3>
+            <div className="flex items-center justify-between pb-2 border-b border-black/10">
+              <h3 id="add-guest-modal-title" className="font-mono-code text-lg font-bold text-[#171717]">
+                Add Guest / Group
+              </h3>
+              <button
+                type="button"
+                onClick={() => setShowAddModal(false)}
+                aria-label="Close add guest modal"
+                className="p-1 hover:bg-black/10 rounded-full cursor-pointer text-[#171717]"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
             <form onSubmit={handleAddGuest} className="space-y-4 text-xs">
               <div>
-                <label className="font-bold text-[#171717] block mb-1">
+                <label htmlFor="guest-name" className="font-bold text-[#171717] block mb-1">
                   Full Name or Group Title
                 </label>
                 <input
                   type="text"
+                  id="guest-name"
                   required
                   placeholder="e.g. Maya Krishnan & Family"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full bg-white p-2.5 rounded-lg neo-border focus:outline-none"
+                  className="w-full bg-white p-2.5 rounded-lg neo-border focus:outline-none focus:ring-1 focus:ring-black"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="font-bold text-[#171717] block mb-1">
+                  <label htmlFor="guest-group" className="font-bold text-[#171717] block mb-1">
                     Group / Affiliation
                   </label>
                   <input
                     type="text"
+                    id="guest-group"
                     value={group}
                     onChange={(e) => setGroup(e.target.value)}
                     placeholder="e.g. VIP Performers"
-                    className="w-full bg-white p-2 rounded-lg neo-border focus:outline-none"
+                    className="w-full bg-white p-2 rounded-lg neo-border focus:outline-none focus:ring-1 focus:ring-black"
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-[#171717] block mb-1">
+                  <label htmlFor="guest-accompanying" className="font-bold text-[#171717] block mb-1">
                     Accompanying (+guests)
                   </label>
                   <input
                     type="number"
+                    id="guest-accompanying"
                     min="0"
                     value={accompanying}
                     onChange={(e) => setAccompanying(Number(e.target.value))}
-                    className="w-full bg-white p-2 rounded-lg neo-border focus:outline-none font-mono-code"
+                    className="w-full bg-white p-2 rounded-lg neo-border focus:outline-none font-mono-code focus:ring-1 focus:ring-black"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="font-bold text-[#171717] block mb-1">
+                <label htmlFor="guest-rsvp-status" className="font-bold text-[#171717] block mb-1">
                   RSVP Status
                 </label>
                 <select
+                  id="guest-rsvp-status"
                   value={rsvpStatus}
                   onChange={(e) => setRsvpStatus(e.target.value as Guest['rsvpStatus'])}
                   className="w-full bg-white p-2 rounded-lg neo-border focus:outline-none font-mono-code text-xs font-bold"
@@ -374,26 +419,28 @@ export const GuestManager: React.FC<GuestManagerProps> = ({
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="font-bold text-[#171717] block mb-1">
+                  <label htmlFor="guest-dietary" className="font-bold text-[#171717] block mb-1">
                     Dietary Requirements
                   </label>
                   <input
                     type="text"
+                    id="guest-dietary"
                     value={dietary}
                     onChange={(e) => setDietary(e.target.value)}
-                    className="w-full bg-white p-2 rounded-lg neo-border focus:outline-none"
+                    className="w-full bg-white p-2 rounded-lg neo-border focus:outline-none focus:ring-1 focus:ring-black"
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-[#171717] block mb-1">
+                  <label htmlFor="guest-table" className="font-bold text-[#171717] block mb-1">
                     Seating / Table
                   </label>
                   <input
                     type="text"
+                    id="guest-table"
                     value={tableGroup}
                     onChange={(e) => setTableGroup(e.target.value)}
                     placeholder="e.g. Front Row 2"
-                    className="w-full bg-white p-2 rounded-lg neo-border focus:outline-none"
+                    className="w-full bg-white p-2 rounded-lg neo-border focus:outline-none focus:ring-1 focus:ring-black"
                   />
                 </div>
               </div>

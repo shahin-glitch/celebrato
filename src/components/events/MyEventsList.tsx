@@ -9,7 +9,6 @@ import {
   Users,
   Wallet,
   ArrowRight,
-  Sparkles,
   RotateCcw,
 } from 'lucide-react';
 
@@ -52,6 +51,7 @@ export const MyEventsList: React.FC<MyEventsListProps> = ({
           <button
             onClick={onResetDemoData}
             title="Reload initial hackathon demo events"
+            aria-label="Reload initial hackathon demo events"
             className="flex items-center gap-1.5 px-3 py-2 bg-white text-[#565656] hover:text-[#171717] rounded-xl neo-border font-mono-code text-xs font-bold hover:bg-black/5 cursor-pointer"
           >
             <RotateCcw className="w-3.5 h-3.5" />
@@ -59,6 +59,7 @@ export const MyEventsList: React.FC<MyEventsListProps> = ({
           </button>
           <button
             onClick={openCreateWizard}
+            aria-label="Create new celebration plan"
             className="flex items-center gap-1.5 px-4 py-2 bg-[#171717] text-white rounded-xl neo-shadow-sm font-mono-code text-xs font-bold hover:bg-[#2b2b2b] cursor-pointer"
           >
             <Plus className="w-4 h-4" />
@@ -132,7 +133,14 @@ export const MyEventsList: React.FC<MyEventsListProps> = ({
                       {completedTasks}/{totalTasks} ({taskPercent}%)
                     </span>
                   </div>
-                  <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div
+                    role="progressbar"
+                    aria-valuenow={taskPercent}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-label={`${ev.name} milestones progress: ${taskPercent}%`}
+                    className="w-full h-2 bg-gray-200 rounded-full overflow-hidden"
+                  >
                     <div
                       className="h-full bg-[#171717] rounded-full"
                       style={{ width: `${taskPercent}%` }}
@@ -145,6 +153,7 @@ export const MyEventsList: React.FC<MyEventsListProps> = ({
               <div className="pt-3 border-t border-black/5 flex items-center justify-between">
                 <button
                   onClick={() => onSelectEvent(ev.id)}
+                  aria-label={`${isActive ? 'Active Plan' : 'Open Plan'} for ${ev.name}`}
                   className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg font-mono-code text-xs font-bold transition-all cursor-pointer ${
                     isActive
                       ? 'bg-[#171717] text-[#C2F2B0]'
@@ -164,6 +173,7 @@ export const MyEventsList: React.FC<MyEventsListProps> = ({
                     }}
                     className="p-1.5 text-gray-400 hover:text-red-600 transition-colors cursor-pointer"
                     title="Delete Event"
+                    aria-label={`Delete event ${ev.name}`}
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
