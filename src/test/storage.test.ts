@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { StorageService } from '../services/storage';
 import { INITIAL_EVENTS, INITIAL_NOTIFICATIONS } from '../services/sampleData';
 import type { EventPlan } from '../types';
@@ -19,9 +19,12 @@ describe('Persistent Storage Service', () => {
   });
 
   it('handles corrupted or invalid JSON in localStorage gracefully', () => {
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     localStorage.setItem('celebrato_events_v1', 'INVALID_JSON{{{');
     const events = StorageService.getEvents();
     expect(events).toEqual(INITIAL_EVENTS);
+    expect(consoleSpy).toHaveBeenCalled();
+    consoleSpy.mockRestore();
   });
 
   it('handles empty array in localStorage by restoring initial events', () => {

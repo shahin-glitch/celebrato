@@ -104,8 +104,8 @@ npm test
 | **Styling** | TailwindCSS v4 (`@tailwindcss/vite`) | Custom neo-brutalist theme tokens, high-contrast palette |
 | **State & Hooks** | Custom Encapsulated Hooks | `useBudgetCalculation`, `useEventPlan`, `useNotifications` |
 | **Icons & Visuals** | Lucide React + Canvas Confetti | Accessible SVG icons with ARIA titles and celebration effects |
-| **Testing** | Vitest + React Testing Library + Playwright | 15 test suites, 87+ unit/integration tests, full E2E journey |
-| **Linter** | Oxlint (`oxlint`) | Zero warnings, zero errors across 42 files |
+| **Testing** | Vitest + React Testing Library + Playwright | 17 test suites, 101+ unit/integration tests, full E2E journey |
+| **Linter** | Oxlint (`oxlint`) | Zero warnings, zero errors across 48 files |
 
 ---
 

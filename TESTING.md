@@ -6,7 +6,7 @@ Celebrato is built with high reliability and maintainability in mind, backed by 
 
 ## 📊 1. Test Suite Architecture
 
-Celebrato maintains **15 test suites and 87+ passing automated tests** with zero flaky tests:
+Celebrato maintains **17 test suites and 101+ passing automated tests** with zero flaky tests:
 
 | Test Suite | File | Focus Area |
 | :--- | :--- | :--- |
@@ -23,6 +23,8 @@ Celebrato maintains **15 test suites and 87+ passing automated tests** with zero
 | **AI Engine Edge Cases** | `src/test/aiGenerator.test.ts` | Offline fallback, HTTP 500 recovery, malformed JSON recovery |
 | **Accessibility Verification** | `src/test/accessibility.test.tsx` | ARIA roles, skip navigation, screen reader landmarks |
 | **Custom React Hooks** | `src/test/hooks.test.ts` | `useBudgetCalculation`, `useNotifications`, `useEventPlan` reactivity |
+| **Utility Logic & Formatting** | `src/test/helpers.test.ts` | Unique ID generation, rapid generation, currency formatting |
+| **Sample Data & Domain Schemas** | `src/test/sampleData.test.ts` | Pre-loaded events, vendor ratings, theme color arrays, notification types |
 | **Overview Dashboard** | `src/test/overviewDashboard.test.tsx` | Metric cards, burn velocity chart, activity feed navigation |
 | **E2E User Journey (Playwright)** | `e2e/userJourney.spec.ts` | Complete multi-step user journey, budget modification, browser refresh persistence |
 
